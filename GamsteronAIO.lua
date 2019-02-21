@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.0794
+local GamsteronAIOVer = 0.0795
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -613,8 +613,8 @@ local AIO = {
                 if Menu.wset.auto.enabled:Value() then
                     for i = 1, #EnemyHeroes do
                         local unit = EnemyHeroes[i]
-                        local ImmobileDuration, SlowDuration = GetImmobileSlowDuration(unit)
-                        if ImmobileDuration > 0.5 and not unit.pathing.isDashing then
+                        local ImmobileDuration = GetImmobileDuration(unit)
+                        if ImmobileDuration > 0.5 and not unit.pathing.isDashing and not unit.pathing.hasMovePath then
                             Control.CastSpell(HK_W, unit)
                         end
                     end
