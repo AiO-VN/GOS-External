@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.0795
+local GamsteronAIOVer = 0.0796
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -202,7 +202,7 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(TwitchVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            self.WData = {delay = 0.25, radius = 50, range = 950, speed = 1400, type = _G.SPELLTYPE_CIRCLE}
+            self.WData = {Delay = 0.25, Radius = 50, Range = 950, Speed = 1400, Type = _G.SPELLTYPE_CIRCLE}
             self.HasQBuff = false
             self.QBuffDuration = 0
             self.HasQASBuff = false
@@ -613,7 +613,7 @@ local AIO = {
                 if Menu.wset.auto.enabled:Value() then
                     for i = 1, #EnemyHeroes do
                         local unit = EnemyHeroes[i]
-                        local ImmobileDuration = GetImmobileDuration(unit)
+                        local ImmobileDuration, spellduration, knockduration = GetImmobileDuration(unit);
                         if ImmobileDuration > 0.5 and not unit.pathing.isDashing and not unit.pathing.hasMovePath then
                             Control.CastSpell(HK_W, unit)
                         end
@@ -790,8 +790,8 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(KarthusVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            self.QData = {delay = 0.625, radius = 1, range = 900, speed = _G.math.huge, collision = false, type = _G.SPELLTYPE_CIRCLE}
-            self.WData = {delay = 0.25, radius = 1, range = 1000, speed = _G.math.huge, collision = false, type = _G.SPELLTYPE_CIRCLE}
+            self.QData = {Delay = 0.625, Radius = 1, Range = 900, Speed = _G.math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
+            self.WData = {Delay = 0.25, Radius = 1, Range = 1000, Speed = _G.math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
         end
         function CHAMPION:Tick()
             -- Is Attacking
@@ -974,9 +974,9 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(KogMawVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            self.QData = {delay = 0.25, radius = 70, range = 1175, speed = 1650, collision = true, type = _G.SPELLTYPE_LINE}
-            self.EData = {delay = 0.25, radius = 120, range = 1280, speed = 1350, collision = false, type = _G.SPELLTYPE_LINE}
-            self.RData = {delay = 1.2, radius = 225, range = 0, speed = math.huge, collision = false, type = _G.SPELLTYPE_CIRCLE}
+            self.QData = {Delay = 0.25, Radius = 70, Range = 1175, Speed = 1650, Collision = true, Type = _G.SPELLTYPE_LINE}
+            self.EData = {Delay = 0.25, Radius = 120, Range = 1280, Speed = 1350, Collision = false, Type = _G.SPELLTYPE_LINE}
+            self.RData = {Delay = 1.2, Radius = 225, Range = 0, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
             self.HasWBuff = false
         end
         function CHAMPION:Tick()
@@ -1017,8 +1017,8 @@ local AIO = {
             -- R
             local result = false
             if meMana > myHero:GetSpellData(_R).mana and SPELLS:IsReady(_R, {q = 0.33, w = 0.15, e = 0.33, r = 0.5}) then
-                self.RData.range = 900 + 300 * myHero:GetSpellData(_R).level
-                local enemyList = OB:GetEnemyHeroes(self.RData.range, false, 0)
+                self.RData.Range = 900 + 300 * myHero:GetSpellData(_R).level
+                local enemyList = OB:GetEnemyHeroes(self.RData.Range, false, 0)
                 local rStacks = LocalCore:GetBuffCount(myHero, "kogmawlivingartillerycost") < Menu.rset.stack:Value()
                 local checkRStacksKS = Menu.rset.ksmenu.csksr:Value()
                 -- KS
@@ -1180,7 +1180,7 @@ local AIO = {
         function CHAMPION:__init()
             _G.GamsteronMenuSpell.isaa:Value(false)
             self.LastReset = 0
-            self.EData = {delay = 0.5, radius = 0, range = 550 - 35, speed = 2000, collision = false, type = _G.SPELLTYPE_LINE}
+            self.EData = {Delay = 0.5, Radius = 0, Range = 550 - 35, Speed = 2000, Collision = false, Type = _G.SPELLTYPE_LINE}
         end
         function CHAMPION:Tick()
             
@@ -1260,11 +1260,11 @@ local AIO = {
                 
                 -- e stun
                 if not result and ((ORB.Modes[ORBWALKER_MODE_COMBO] and Menu.eset.combo:Value()) or (ORB.Modes[ORBWALKER_MODE_HARASS] and Menu.eset.harass:Value())) then
-                    local eRange = self.EData.range + myHero.boundingRadius
+                    local eRange = self.EData.Range + myHero.boundingRadius
                     for i = 1, LocalGameHeroCount() do
                         local hero = LocalGameHero(i)
                         if LocalCore:IsValidTarget(hero) and hero.team == LocalCore.TEAM_ENEMY and myHero.pos:DistanceTo(hero.pos) < eRange + hero.boundingRadius and not OB:IsHeroImmortal(hero, false) then
-                            if Menu.eset.useonstun[hero.charName] and Menu.eset.useonstun[hero.charName]:Value() and CheckWall(myHero.pos, hero.pos, 450) and CheckWall(myHero.pos, hero:GetPrediction(self.EData.delay + 0.06 + LATENCY, self.EData.speed), 450) then
+                            if Menu.eset.useonstun[hero.charName] and Menu.eset.useonstun[hero.charName]:Value() and CheckWall(myHero.pos, hero.pos, 450) and CheckWall(myHero.pos, hero:GetPrediction(self.EData.Delay + 0.06 + LATENCY, self.EData.Speed), 450) then
                                 result = Control.CastSpell(HK_E, hero)
                                 break
                             end
@@ -1962,7 +1962,7 @@ local AIO = {
                 end
                 if not result and Menu.rset.rci:Value() then
                     local t = LocalCore:GetImmobileEnemy(enemyList, 900)
-                    if t and myHero.pos:DistanceTo(t.pos) < self.RData.range then
+                    if t and myHero.pos:DistanceTo(t.pos) < self.RData.Range then
                         result = Control.CastSpell(HK_R, t)
                     end
                 end
@@ -2096,18 +2096,21 @@ local AIO = {
         local Spin = false
         local daggerPos = {}
         local Spells = {
-            Q = {range = 625},
+            Q = {Range = 625},
             W = {},
-            E = {range = 725},
-            R = {range = 550},
-        P = {range = 340}}
+            E = {Range = 725},
+            R = {Range = 550},
+            P = {Range = 340},
+        };
         local DAMAGE_TYPE_PHYSICAL = 0
         local DAMAGE_TYPE_MAGICAL = 1
         local DAMAGE_TYPE_TRUE = 2
-        local dmg = {
+        local dmg =
+        {
             [_Q] = {Type = DAMAGE_TYPE_MAGICAL, RawDamage = function(source, target, level) return ({75, 105, 135, 165, 195})[level] + 0.3 * source.ap end},
             [_E] = {Type = DAMAGE_TYPE_MAGICAL, RawDamage = function(source, target, level) return ({30, 45, 60, 75, 90})[level] + 0.25 * source.ap + 0.5 * source.totalDamage end},
-        [_R] = {Type = DAMAGE_TYPE_MAGICAL, RawDamage = function(source, target, level) return ({25, 37.5, 50})[level] + 0.22 * source.bonusDamage + 0.19 * source.ap end}}
+            [_R] = {Type = DAMAGE_TYPE_MAGICAL, RawDamage = function(source, target, level) return ({25, 37.5, 50})[level] + 0.22 * source.bonusDamage + 0.19 * source.ap end},
+        };
         
         local function getdmg(slot, target, source)
             if slot == "Q" then slot = _Q elseif slot == "W" then slot = _W elseif slot == "E" then slot = _E elseif slot == "R" then slot = _R end
@@ -2223,7 +2226,7 @@ local AIO = {
             local found = false
             if Spin == true then
                 for K, Enemy in pairs(self:GetEnemyHeroes()) do
-                    if self:IsValidTarget(Enemy, Spells.R.range, false, myHero.pos) then
+                    if self:IsValidTarget(Enemy, Spells.R.Range, false, myHero.pos) then
                         found = true
                     end
                 end
@@ -2237,22 +2240,22 @@ local AIO = {
         function CHAMPION:KillSteal()
             if Menu.Ks.Disabled:Value() or (self:IsRecalling() and Menu.Ks.Recall:Value()) or Spin then return end
             for K, Enemy in pairs(self:GetEnemyHeroes()) do
-                if Menu.Ks.Q:Value() and self:IsReady(_Q) and self:IsValidTarget(Enemy, Spells.Q.range, false, myHero.pos) then
+                if Menu.Ks.Q:Value() and self:IsReady(_Q) and self:IsValidTarget(Enemy, Spells.Q.Range, false, myHero.pos) then
                     if getdmg("Q", Enemy, myHero) > Enemy.health then
                         self:CastQ(Enemy)
                     end
                 end
-                if Menu.Ks.Q:Value() and Menu.Ks.E:Value() and self:IsReady(_Q) and self:IsReady(_E) and self:IsValidTarget(Enemy, Spells.Q.range + Spells.E.range, false, myHero.pos) then
+                if Menu.Ks.Q:Value() and Menu.Ks.E:Value() and self:IsReady(_Q) and self:IsReady(_E) and self:IsValidTarget(Enemy, Spells.Q.Range + Spells.E.Range, false, myHero.pos) then
                     if getdmg("Q", Enemy, myHero) > Enemy.health then
                         self:EKS(Enemy)
                     end
                 end
-                if Menu.Ks.E:Value() and self:IsReady(_E) and self:IsValidTarget(Enemy, Spells.E.range, false, myHero.pos) then
+                if Menu.Ks.E:Value() and self:IsReady(_E) and self:IsValidTarget(Enemy, Spells.E.Range, false, myHero.pos) then
                     if getdmg("E", Enemy, myHero) > Enemy.health then
                         self:CastE(Enemy)
                     end
                 end
-                if Menu.Ks.R:Value() and self:IsReady(_R) and self:IsValidTarget(Enemy, Spells.R.range, false, myHero.pos) then
+                if Menu.Ks.R:Value() and self:IsReady(_R) and self:IsValidTarget(Enemy, Spells.R.Range, false, myHero.pos) then
                     if getdmg("R", Enemy, myHero) > Enemy.health then
                         self:CastR()
                     end
@@ -2272,17 +2275,17 @@ local AIO = {
         
         function CHAMPION:EKS(target)
             for K, Enemy in pairs(self:GetEnemyHeroes()) do
-                if self:IsValidTarget(Enemy, Spells.E.range, false, myHero.pos) and Enemy.pos:DistanceTo(target.pos) < Spells.Q.range then
+                if self:IsValidTarget(Enemy, Spells.E.Range, false, myHero.pos) and Enemy.pos:DistanceTo(target.pos) < Spells.Q.Range then
                     self:CastE(Enemy) return
                 end
             end
             for K, Ally in pairs(self:GetAllyHeroes()) do
-                if self:IsValidTarget(Ally, Spells.E.range, false, myHero.pos) and Ally.pos:DistanceTo(target.pos) < Spells.Q.range then
+                if self:IsValidTarget(Ally, Spells.E.Range, false, myHero.pos) and Ally.pos:DistanceTo(target.pos) < Spells.Q.Range then
                     self:CastE(Ally) return
                 end
             end
-            for K, Minion in pairs(self:GetMinions(Spells.E.range)) do
-                if self:IsValidTarget(Minion, Spells.E.range, false, myHero.pos) and Minion.pos:DistanceTo(target.pos) < Spells.Q.range then
+            for K, Minion in pairs(self:GetMinions(Spells.E.Range)) do
+                if self:IsValidTarget(Minion, Spells.E.Range, false, myHero.pos) and Minion.pos:DistanceTo(target.pos) < Spells.Q.Range then
                     self:CastE(Minion) return
                 end
             end
@@ -2330,18 +2333,18 @@ local AIO = {
         
         function CHAMPION:NormalCombo(target)
             if Menu.Combo.E:Value() and self:IsReady(_E) then
-                local target = self:GetTarget(Spells.E.range)
-                if self:IsValidTarget(target, Spells.E.range, false, myHero.pos)then
+                local target = self:GetTarget(Spells.E.Range)
+                if self:IsValidTarget(target, Spells.E.Range, false, myHero.pos)then
                     Control.CastSpell(HK_E, target)
                 end
             elseif Menu.Combo.W:Value() and self:IsReady(_W) then
-                local target = self:GetTarget(Spells.P.range)
-                if target ~= nil and self:IsValidTarget(target, Spells.P.range, false, myHero.pos) then
+                local target = self:GetTarget(Spells.P.Range)
+                if target ~= nil and self:IsValidTarget(target, Spells.P.Range, false, myHero.pos) then
                     self:CastW()
                 end
             elseif Menu.Combo.Q:Value() and self:IsReady(_Q) then
-                local target = self:GetTarget(Spells.Q.range)
-                if target ~= nil and self:IsValidTarget(target, Spells.Q.range, false, myHero.pos) then
+                local target = self:GetTarget(Spells.Q.Range)
+                if target ~= nil and self:IsValidTarget(target, Spells.Q.Range, false, myHero.pos) then
                     self:CastQ(target)
                 end
             elseif Menu.Combo.R:Value() and self:IsReady(_R) then
@@ -2354,14 +2357,14 @@ local AIO = {
             elseif Menu.Combo.E:Value() and self:IsReady(_E) then
                 for i = 1, #daggerPos do
                     for i, Enemy in pairs(self:GetEnemyHeroes()) do
-                        if self:IsValidTarget(Enemy, Spells.E.range + Spells.P.range, false, myHero.pos) and self:IsValidTarget(Enemy, Spells.P.range, false, daggerPos[i]) then
+                        if self:IsValidTarget(Enemy, Spells.E.Range + Spells.P.Range, false, myHero.pos) and self:IsValidTarget(Enemy, Spells.P.Range, false, daggerPos[i]) then
                             self:CastE(daggerPos[i])
                         end
                     end
                 end
             elseif Menu.Combo.E:Value() and self:IsReady(_E) then
-                local target = self:GetTarget(Spells.E.range)
-                if self:IsValidTarget(target, Spells.E.range, false, myHero.pos)then
+                local target = self:GetTarget(Spells.E.Range)
+                if self:IsValidTarget(target, Spells.E.Range, false, myHero.pos)then
                     Control.CastSpell(HK_E, target)
                 end
             end
@@ -2372,27 +2375,27 @@ local AIO = {
             if Menu.Harass.E:Value() and self:IsReady(_E) and not Spin then
                 for i = 1, #daggerPos do
                     for i, Enemy in pairs(self:GetEnemyHeroes()) do
-                        if self:IsValidTarget(Enemy, Spells.E.range + Spells.P.range, false, myHero.pos) and self:IsValidTarget(Enemy, Spells.P.range, false, daggerPos[i]) then
+                        if self:IsValidTarget(Enemy, Spells.E.Range + Spells.P.Range, false, myHero.pos) and self:IsValidTarget(Enemy, Spells.P.Range, false, daggerPos[i]) then
                             self:CastE(daggerPos[i])
                         end
                     end
                 end
             end
             if Menu.Harass.E:Value() and self:IsReady(_E) then
-                local target = self:GetTarget(Spells.E.range)
-                if target ~= nil and self:IsValidTarget(target, Spells.E.range, false, myHero.pos)then
+                local target = self:GetTarget(Spells.E.Range)
+                if target ~= nil and self:IsValidTarget(target, Spells.E.Range, false, myHero.pos)then
                     self:CastE(target)
                 end
             end
             if Menu.Harass.W:Value() and self:IsReady(_W) then
-                local target = self:GetTarget(Spells.P.range)
-                if target ~= nil and self:IsValidTarget(target, Spells.P.range, false, myHero.pos) then
+                local target = self:GetTarget(Spells.P.Range)
+                if target ~= nil and self:IsValidTarget(target, Spells.P.Range, false, myHero.pos) then
                     self:CastW()
                 end
             end
             if Menu.Harass.Q:Value() and self:IsReady(_Q) then
-                local target = self:GetTarget(Spells.Q.range)
-                if target ~= nil and self:IsValidTarget(target, Spells.Q.range, false, myHero.pos) then
+                local target = self:GetTarget(Spells.Q.Range)
+                if target ~= nil and self:IsValidTarget(target, Spells.Q.Range, false, myHero.pos) then
                     self:CastQ(target)
                 end
             end
