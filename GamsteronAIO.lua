@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.0796
+local GamsteronAIOVer = 0.0797
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -790,8 +790,8 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(KarthusVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            self.QData = {Delay = 0.625, Radius = 1, Range = 900, Speed = _G.math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
-            self.WData = {Delay = 0.25, Radius = 1, Range = 1000, Speed = _G.math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
+            self.QData = {Delay = 0.85, Radius = 200, Range = 875, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
+            self.WData = {Delay = 0.25, Radius = 1, Range = 1000, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
         end
         function CHAMPION:Tick()
             -- Is Attacking
@@ -822,7 +822,8 @@ local AIO = {
                 end
             end
             -- Q
-            if SPELLS:IsReady(_Q, {q = 0.5, w = 0.33, e = 0.33, r = 3.23}) and myHero:GetSpellData(_Q).ammoCd == 0 and myHero:GetSpellData(_Q).ammoCurrentCd == 0 and myHero:GetSpellData(_Q).ammo == 2 then
+            local qdata = myHero:GetSpellData(_Q);
+            if (SPELLS:IsReady(_Q, {q = 0.5, w = 0.33, e = 0.33, r = 3.23}) and qdata.ammoCd == 0 and qdata.ammoCurrentCd == 0 and qdata.ammo == 2 and qdata.ammoTime - Game.Timer() < 0) then
                 -- KS
                 if Menu.qset.killsteal.enabled:Value() then
                     local qDmg = self:GetQDmg()
@@ -1929,11 +1930,11 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(VarusVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            self.HasQBuff = false
-            self.QStartTime = 0
-            self.QData = {Delay = 0.1, Radius = 70, Range = 1650, Speed = 1900, Collision = false, Type = _G.SPELLTYPE_LINE}
-            self.EData = {Delay = 0.5, Radius = 235, Range = 925, Speed = 1500, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
-            self.RData = {Delay = 0.25, Radius = 120, Range = 1075, Speed = 1950, Collision = false, Type = _G.SPELLTYPE_LINE}
+            self.HasQBuff = false;
+            self.QStartTime = 0;
+            self.QData = {Delay = 0.1, Radius = 70, Range = 1650, Speed = 1900, Collision = false, Type = _G.SPELLTYPE_LINE};
+            self.EData = {Delay = 0.5, Radius = 235, Range = 925, Speed = 1500, Collision = false, Type = _G.SPELLTYPE_CIRCLE};
+            self.RData = {Delay = 0.25, Radius = 120, Range = 1075, Speed = 1950, Collision = false, Type = _G.SPELLTYPE_LINE};
         end
         function CHAMPION:WndMsg(msg, wParam)
             if wParam == HK_Q then
@@ -2030,7 +2031,7 @@ local AIO = {
                     end
                     local qt = TS:GetTarget(qTargets, 0)
                     if LocalCore:IsValidTarget(qt) then
-                        local Pred = GetGamsteronPrediction(qt, self.QData, myHero.pos)
+                        local Pred = GetGamsteronPrediction(qt, self.QData, myHero)
                         if Pred.Hitchance >= Menu.qset.hitchance:Value() + 1 and LocalCore:IsInRange(Pred.CastPosition, myHero.pos, 925 + qExtraRange) and LocalCore:IsInRange(Pred.UnitPosition, myHero.pos, 925 + qExtraRange) then
                             LocalCore:CastSpell(HK_Q, nil, Pred.CastPosition)
                         end
@@ -2581,6 +2582,15 @@ AddLoadCallback(function()
     end
     if CHAMPION.Draw then
         Callback.Add('Draw', function()
+            --[=======[
+            local str = "";
+            local sd = myHero:GetSpellData(_Q);
+            for i, k in pairs(sd) do
+                str = str .. i .. ": " .. k .. "\n";
+            end
+            str = str .. tostring(sd.ammoTime - Game.Timer());
+            Draw.Text(str, myHero.pos:To2D())
+            --]=======]
             if _G.GamsteronDebug then
                 local status, err = pcall(function () CHAMPION:Draw() end) if not status then print("CHAMPION.Draw " .. tostring(err)) end
             else
