@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.0797
+local GamsteronAIOVer = 0.0798
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -790,7 +790,7 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(KarthusVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            self.QData = {Delay = 0.85, Radius = 200, Range = 875, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
+            self.QData = {Delay = 1, Radius = 200, Range = 875, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
             self.WData = {Delay = 0.25, Radius = 1, Range = 1000, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
         end
         function CHAMPION:Tick()
@@ -2582,7 +2582,7 @@ AddLoadCallback(function()
     end
     if CHAMPION.Draw then
         Callback.Add('Draw', function()
-            --[=======[
+            --[===============[
             local str = "";
             local sd = myHero:GetSpellData(_Q);
             for i, k in pairs(sd) do
@@ -2590,7 +2590,15 @@ AddLoadCallback(function()
             end
             str = str .. tostring(sd.ammoTime - Game.Timer());
             Draw.Text(str, myHero.pos:To2D())
-            --]=======]
+            local s = myHero.activeSpell;
+            if s and s.valid then
+                set = s.startTime;
+            end
+            local et = Game.Timer() - set - 0.067;
+            if et > 0.8 and et < 0.9 then
+                print(et);
+            end
+            --]===============]
             if _G.GamsteronDebug then
                 local status, err = pcall(function () CHAMPION:Draw() end) if not status then print("CHAMPION.Draw " .. tostring(err)) end
             else
