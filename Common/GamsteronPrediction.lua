@@ -54,7 +54,7 @@ API:
  
     GetImmobileDuration = function(unit (object))
  
-        return float (seconds)
+        return ImmobileDuration, SpellStartTime, AttackStartTime, KnockDuration
  
  
 --]=========================================================]
