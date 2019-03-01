@@ -8,7 +8,7 @@
 --]======]
 
 -- SCRIPT INFO
-local Version = 0.03;
+local Version = 0.04;
 local ScriptName = "GamsteronJhin";
 
 -- RETURN IF NOT JHIN
@@ -96,6 +96,7 @@ Menu:MenuElement({name = "E settings", id = "eset", type = MENU})
 Menu.eset:MenuElement({id = "onlyimmo", name = "Only Immobile", value = true})
 Menu.eset:MenuElement({id = "combo", name = "Combo", value = true})
 Menu.eset:MenuElement({id = "harass", name = "Harass", value = false})
+Menu:MenuElement({name = "Version " .. tostring(Version), type = _G.SPACE, id = "verspace"})
 
 -- JHIN VARIABLES
 local champInfo =
@@ -334,9 +335,10 @@ local function RLogic()
     elseif (champInfo.hasRBuff == true and rData.canDraw == true and Game.Timer() > LocalSDK.Spells.LastRk + 0.500) then
         champInfo.hasRBuff = false;
         rData.canDraw = false;
-    end
-    if (Game.Timer() < LocalSDK.Spells.LastRk + 0.35) then
+    elseif (Game.Timer() < LocalSDK.Spells.LastRk + 0.35) then
         champInfo.hasRBuff = true;
+    elseif champInfo.hasRBuff then
+        champInfo.hasRBuff = false;
     end
 end
 
