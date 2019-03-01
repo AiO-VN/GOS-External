@@ -8,7 +8,7 @@
 --]======]
 
 -- SCRIPT INFO
-local Version = 0.04;
+local Version = 0.05;
 local ScriptName = "GamsteronJhin";
 
 -- RETURN IF NOT JHIN
@@ -181,9 +181,15 @@ local function HasBuff(unit, bName)
     return false
 end
 
-local function IsValid(unit, range)
-    if (unit and unit.valid and unit.isTargetable and unit.alive and unit.visible and unit.networkID and unit.pathing and unit.health > 0 and GetDistance(myHero.pos, unit.pos)) then
-        return true;
+local function IsValid(unit, range, bbox)
+    if (unit and unit.valid and unit.isTargetable and unit.alive and unit.visible and unit.networkID and unit.pathing and unit.health > 0) then
+        local bbRange = 0;
+        if (bbox) then
+            bbRange = myHero.boundingRadius + unit.boundingRadius;
+        end
+        if (GetDistance(myHero, unit) < range + bbRange) then
+            return true;
+        end
     end
     return false;
 end
@@ -192,14 +198,8 @@ local function GetEnemyHeroes(range, bbox)
     local _EnemyHeroes = {};
     for i = 1, Game.HeroCount() do
         local hero = Game.Hero(i);
-        if IsValid(hero) and hero.isEnemy then
-            local extraRange = 0;
-            if (bbox) then
-                extraRange = hero.boundingRadius;
-            end
-            if (GetDistance(myHero, hero) < range + extraRange) then
-                table.insert(_EnemyHeroes, hero);
-            end
+        if IsValid(hero, range, bbox) and hero.isEnemy then
+            table.insert(_EnemyHeroes, hero);
         end
     end
     return _EnemyHeroes;
