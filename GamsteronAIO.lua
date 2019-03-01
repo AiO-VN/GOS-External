@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.081
+local GamsteronAIOVer = 0.082
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -1399,8 +1399,8 @@ local AIO = {
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
             self.ETarget = nil
-            self.QData = {Delay = 0.25, Radius = 80, Range = 1050, Speed = 1550, Collision = true, Type = _G.SPELLTYPE_LINE}
-            self.WData = {Delay = 0.625, Radius = 100, Range = 875, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
+            self.QData = {Delay = 0.25, Radius = 60, Range = 1085, Speed = 1600, Collision = true, Type = _G.SPELLTYPE_LINE}
+            self.WData = {Delay = 0.9, Radius = 260, Range = 880, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
         end
         function CHAMPION:Tick()
             -- Is Attacking
@@ -2572,7 +2572,7 @@ AddLoadCallback(function()
         end)
     end
     if CHAMPION.Tick then
-        Callback.Add("Tick", function()
+        Callback.Add("Draw", function()
             if _G.GamsteronDebug then
                 local status, err = pcall(function () CHAMPION:Tick() end) if not status then print("CHAMPION.Tick " .. tostring(err)) end
             else
@@ -2580,6 +2580,7 @@ AddLoadCallback(function()
             end
         end)
     end
+    local set = 0;
     if CHAMPION.Draw then
         Callback.Add('Draw', function()
             --[===============[
