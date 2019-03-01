@@ -8,7 +8,7 @@
 --]======]
 
 -- SCRIPT INFO
-local Version = 0.01;
+local Version = 0.02;
 local ScriptName = "GamsteronJhin";
 
 -- RETURN IF NOT JHIN
@@ -379,16 +379,15 @@ AddLoadCallback(function()
                 HITCHANCE_HIGH
             );
             -- e
-            if (Menu.eset.onlyimmo:Value()) then
-                local isCombo = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_COMBO];
-                local isHarass = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_HARASS];
-                if (Bool(Bool(isCombo and Menu.eset.combo:Value()) or Bool(isHarass and Menu.eset.harass:Value())) and LocalSDK.Spells:IsReady(_E, {q = 0.35, w = 0.75, e = 1, r = 0.5, })) then
-                    local target = GetImmobileEnemy(spellData.e.Range, 0.5);
-                    if (target) then
-                        Control.CastSpell(HK_E, target.pos);
-                    end
+            local isCombo = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_COMBO];
+            local isHarass = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_HARASS];
+            if (Bool(Bool(isCombo and Menu.eset.combo:Value()) or Bool(isHarass and Menu.eset.harass:Value())) and LocalSDK.Spells:IsReady(_E, {q = 0.35, w = 0.75, e = 1, r = 0.5, })) then
+                local target = GetImmobileEnemy(spellData.e.Range, 0.5);
+                if (target) then
+                    Control.CastSpell(HK_E, target.pos);
                 end
-            else
+            end
+            if (not Menu.eset.onlyimmo:Value()) then
                 CastSkillShot(
                     Menu.eset.combo:Value(),
                     Menu.eset.harass:Value(),
