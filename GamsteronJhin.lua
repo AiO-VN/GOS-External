@@ -8,7 +8,7 @@
 --]======]
 
 -- SCRIPT INFO
-local Version = 0.02;
+local Version = 0.03;
 local ScriptName = "GamsteronJhin";
 
 -- RETURN IF NOT JHIN
@@ -44,10 +44,10 @@ local LocalCore = _G.GamsteronCore;
 -- AUTO UPDATER
 local UpdateSuccess, UpdateVersion = LocalCore:AutoUpdate({
     version = Version,
-    scriptPath = COMMON_PATH .. ScriptName .. ".lua",
-    scriptUrl = "https://raw.githubusercontent.com/gamsteron/GOS-External/master/Common/" .. ScriptName .. ".lua",
-    versionPath = COMMON_PATH .. ScriptName .. ".version",
-    versionUrl = "https://raw.githubusercontent.com/gamsteron/GOS-External/master/Common/" .. ScriptName .. ".version"
+    scriptPath = SCRIPT_PATH .. ScriptName .. ".lua",
+    scriptUrl = "https://raw.githubusercontent.com/gamsteron/GOS-External/master/" .. ScriptName .. ".lua",
+    versionPath = SCRIPT_PATH .. ScriptName .. ".version",
+    versionUrl = "https://raw.githubusercontent.com/gamsteron/GOS-External/master/" .. ScriptName .. ".version"
 })
 if (UpdateSuccess) then
     print(ScriptName .. " updated to version " .. UpdateVersion .. ". Please Reload with 2x F6 !");
@@ -341,6 +341,7 @@ local function RLogic()
 end
 
 AddLoadCallback(function()
+    _G.GamsteronMenuSpell.isaaa:Value(true);
     -- TICK
     Callback.Add('Draw', function()
         -- p
