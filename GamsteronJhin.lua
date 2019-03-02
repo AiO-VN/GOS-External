@@ -8,7 +8,7 @@
 --]======]
 
 -- SCRIPT INFO
-local Version = 0.05;
+local Version = 0.06;
 local ScriptName = "GamsteronJhin";
 
 -- RETURN IF NOT JHIN
@@ -90,6 +90,7 @@ Menu:MenuElement({name = "Q settings", id = "qset", type = MENU})
 Menu.qset:MenuElement({id = "combo", name = "Combo", value = true})
 Menu.qset:MenuElement({id = "harass", name = "Harass", value = false})
 Menu:MenuElement({name = "W settings", id = "wset", type = MENU})
+Menu.wset:MenuElement({id = "stun", name = "Only if stun (marked targets)", value = true})
 Menu.wset:MenuElement({id = "combo", name = "Combo", value = true})
 Menu.wset:MenuElement({id = "harass", name = "Harass", value = false})
 Menu:MenuElement({name = "E settings", id = "eset", type = MENU})
@@ -237,59 +238,60 @@ local function GetImmobileEnemy(range, duration)
 end
 
 -- SPELLS
-local function CastTarget(menuCombo, menuHarass, spell, hkSpell, delays, sData, dType, hType, bbox)
+local function IsReadyCombo(spell, menuCombo, menuHarass, delays)
     local isCombo = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_COMBO];
     local isHarass = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_HARASS];
     if (Bool(Bool(isCombo and menuCombo) or Bool(isHarass and menuHarass)) and LocalSDK.Spells:IsReady(spell, delays)) then
-        local target = LocalSDK.TargetSelector:GetComboTarget();
-        local range = sData.Range;
+        return true;
+    end
+    return false;
+end
+
+local function CastTarget(hkSpell, sData, dType, hType, bbox, func)
+    local target = LocalSDK.TargetSelector:GetComboTarget();
+    local range = sData.Range - 35;
+    if (bbox) then
+        range = range + myHero.boundingRadius;
+    end
+    if (target ~= nil) then
+        local extraRange = 0;
         if (bbox) then
-            range = range + myHero.boundingRadius - 35;
+            extraRange = target.boundingRadius;
         end
-        if (target ~= nil) then
-            local extraRange = 0;
-            if (bbox) then
-                extraRange = target.boundingRadius;
-            end
-            if GetDistance(target, myHero) > range + extraRange then
-                target = nil;
-            end
+        if (GetDistance(target, myHero) > range + extraRange or func(target) == false) then
+            target = nil;
         end
-        if (target == nil) then
-            target = LocalSDK.TargetSelector:GetTarget(range, dType, bbox, hType);
-        end
-        if (target) then
-            Control.CastSpell(HK_Q, target);
-        end
+    end
+    if (target == nil) then
+        target = LocalSDK.TargetSelector:GetTarget(LocalSDK.ObjectManager:GetEnemyHeroes(range, bbox, hType, func), dType);
+    end
+    if (target) then
+        Control.CastSpell(hkSpell, target);
     end
 end
 
-local function CastSkillShot(menuCombo, menuHarass, spell, hkSpell, delays, sData, dType, hType, bbox, hc)
-    local isCombo = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_COMBO];
-    local isHarass = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_HARASS];
-    if (Bool(Bool(isCombo and menuCombo) or Bool(isHarass and menuHarass)) and LocalSDK.Spells:IsReady(spell, delays)) then
-        local target = LocalSDK.TargetSelector:GetComboTarget();
-        local range = sData.Range;
+local function CastSkillShot(hkSpell, sData, dType, hType, bbox, hc, func)
+    local target = LocalSDK.TargetSelector:GetComboTarget();
+    local range = sData.Range - 35;
+    if (bbox) then
+        range = range + myHero.boundingRadius;
+    end
+    if (target ~= nil) then
+        local extraRange = 0;
         if (bbox) then
-            range = range + myHero.boundingRadius - 35;
+            extraRange = target.boundingRadius;
         end
-        if (target ~= nil) then
-            local extraRange = 0;
-            if (bbox) then
-                extraRange = target.boundingRadius;
-            end
-            if GetDistance(target, myHero) > range + extraRange then
-                target = nil;
-            end
+        if (GetDistance(target, myHero) > range + extraRange or func(target) == false) then
+            target = nil;
         end
-        if (target == nil) then
-            target = LocalSDK.TargetSelector:GetTarget(range, dType, bbox, hType);
-        end
-        if (target) then
-            local Pred = GetGamsteronPrediction(target, sData, myHero);
-            if (Pred.Hitchance >= hc) then
-                Control.CastSpell(hkSpell, Pred.CastPosition);
-            end
+    end
+    if (target == nil) then
+        target = LocalSDK.TargetSelector:GetTarget(LocalSDK.ObjectManager:GetEnemyHeroes(range, bbox, hType, func), dType);
+    end
+    if (target) then
+        local Pred = GetGamsteronPrediction(target, sData, myHero);
+        if (Pred.Hitchance >= hc) then
+            Control.CastSpell(hkSpell, Pred.CastPosition);
         end
     end
 end
@@ -355,54 +357,58 @@ AddLoadCallback(function()
             return;
         end
         -- after attack
-        if Bool(champInfo.hasPBuff or LocalSDK.Orbwalker:CanMoveSpell()) then
+        if (Bool(champInfo.hasPBuff or LocalSDK.Orbwalker:CanMoveSpell())) then
             -- q
-            CastTarget(
-                Menu.qset.combo:Value(),
-                Menu.qset.harass:Value(),
-                _Q,
-                HK_Q,
-                {q = 1, w = 0.75, e = 0.35, r = 0.5, },
-                spellData.q,
-                DAMAGE_TYPE_PHYSICAL,
-                true,
-                HEROES_SPELL
-            );
-            -- w
-            CastSkillShot(
-                Menu.wset.combo:Value(),
-                Menu.wset.harass:Value(),
-                _W,
-                HK_W,
-                {q = 0.35, w = 1, e = 0.35, r = 0.5, },
-                spellData.w,
-                DAMAGE_TYPE_PHYSICAL,
-                false,
-                HEROES_SPELL,
-                HITCHANCE_HIGH
-            );
-            -- e
-            local isCombo = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_COMBO];
-            local isHarass = LocalSDK.Orbwalker.Modes[ORBWALKER_MODE_HARASS];
-            if (Bool(Bool(isCombo and Menu.eset.combo:Value()) or Bool(isHarass and Menu.eset.harass:Value())) and LocalSDK.Spells:IsReady(_E, {q = 0.35, w = 0.75, e = 1, r = 0.5, })) then
-                local target = GetImmobileEnemy(spellData.e.Range, 0.5);
-                if (target) then
-                    Control.CastSpell(HK_E, target.pos);
-                end
+            if (IsReadyCombo(_Q, Menu.qset.combo:Value(), Menu.qset.harass:Value(), {q = 1, w = 0.75, e = 0.35, r = 0.5, })) then
+                CastTarget(
+                    HK_Q,
+                    spellData.q,
+                    DAMAGE_TYPE_PHYSICAL,
+                    true,
+                    HEROES_SPELL,
+                    function(unit)
+                        return true;
+                    end
+                );
             end
-            if (not Menu.eset.onlyimmo:Value()) then
+            -- w
+            if (IsReadyCombo(_W, Menu.wset.combo:Value(), Menu.wset.harass:Value(), {q = 0.35, w = 1, e = 0.35, r = 0.5, })) then
                 CastSkillShot(
-                    Menu.eset.combo:Value(),
-                    Menu.eset.harass:Value(),
-                    _E,
-                    HK_E,
-                    {q = 0.35, w = 0.75, e = 1, r = 0.5, },
-                    spellData.e,
+                    HK_W,
+                    spellData.w,
                     DAMAGE_TYPE_PHYSICAL,
                     false,
                     HEROES_SPELL,
-                    HITCHANCE_HIGH
+                    HITCHANCE_HIGH,
+                    function(unit)
+                        if (Menu.wset.stun:Value()) then
+                            if (HasBuff(unit, "jhinespotteddebuff")) then
+                                return true;
+                            end
+                            return false;
+                        end
+                        return true;
+                    end
                 );
+            end
+            -- e
+            if (IsReadyCombo(_E, Menu.eset.combo:Value(), Menu.eset.harass:Value(), {q = 0.35, w = 0.75, e = 1, r = 0.5, })) then
+                local target = GetImmobileEnemy(spellData.e.Range, 0.5);
+                if (target) then
+                    Control.CastSpell(HK_E, target.pos);
+                elseif (not Menu.eset.onlyimmo:Value()) then
+                    CastSkillShot(
+                        HK_E,
+                        spellData.e,
+                        DAMAGE_TYPE_PHYSICAL,
+                        false,
+                        HEROES_SPELL,
+                        HITCHANCE_HIGH,
+                        function(unit)
+                            return true;
+                        end
+                    );
+                end
             end
         end
     end)
