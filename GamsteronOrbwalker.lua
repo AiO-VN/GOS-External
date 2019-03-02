@@ -1,4 +1,4 @@
-local GamsteronOrbVer = 0.08
+local GamsteronOrbVer = 0.09
 local LocalCore, Menu, MenuItem, Cursor, Items, Spells, Damage, ObjectManager, TargetSelector, HealthPrediction, Orbwalker, HoldPositionButton
 local AttackSpeedData = {windup = myHero.attackData.windUpTime, anim = myHero.attackData.animationTime, tickwindup = os.clock(), tickanim = os.clock()}
 
@@ -1220,8 +1220,11 @@ do
         return result
     end
     
-    function __ObjectManager:GetEnemyHeroes(range, bb, state)
+    function __ObjectManager:GetEnemyHeroes(range, bb, state, func)
         local result = {};
+        if (func == nil) then
+            func = function(unit) return true; end
+        end
         state = state or 0;
         range = range or MathHuge;
         --state "spell" = 0
@@ -1230,7 +1233,7 @@ do
         local mePos = myHero.pos;
         for i = 1, GameHeroCount() do
             local hero = GameHero(i);
-            if (LocalCore:IsValidTarget(hero) and hero.team == LocalCore.TEAM_ENEMY) then
+            if (LocalCore:IsValidTarget(hero) and hero.team == LocalCore.TEAM_ENEMY and func(hero)) then
                 local r = range;
                 if (bb) then
                     r = r + hero.boundingRadius;
