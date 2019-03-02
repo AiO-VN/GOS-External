@@ -1,4 +1,4 @@
-local GamsteronOrbVer = 0.0778
+local GamsteronOrbVer = 0.08
 local LocalCore, Menu, MenuItem, Cursor, Items, Spells, Damage, ObjectManager, TargetSelector, HealthPrediction, Orbwalker, HoldPositionButton
 local AttackSpeedData = {windup = myHero.attackData.windUpTime, anim = myHero.attackData.animationTime, tickwindup = os.clock(), tickanim = os.clock()}
 
@@ -152,6 +152,7 @@ local function GetHumanizer()
     return humnum
 end
 
+-- cursor
 do
     local __Cursor = LocalCore:Class()
     
@@ -239,19 +240,20 @@ do
         Menu.gsodraw:MenuElement({name = "Cursor Pos", id = "cursor", type = _G.MENU})
         Menu.gsodraw.cursor:MenuElement({name = "Enabled", id = "enabled", value = true})
         Menu.gsodraw.cursor:MenuElement({name = "Color", id = "colorr", color = DrawColor(255, 0, 255, 0)})
-        Menu.gsodraw.cursor:MenuElement({name = "Width", id = "width", value = 3, min = 1, max = 10})
+        Menu.gsodraw.cursor:MenuElement({name = "Width", id = "widthh", value = 1, min = 1, max = 3})
         Menu.gsodraw.cursor:MenuElement({name = "Radius", id = "radius", value = 150, min = 1, max = 300})
     end
     
     function __Cursor:Draw()
         if Menu.gsodraw.cursor.enabled:Value() then
-            DrawCircle(mousePos, Menu.gsodraw.cursor.radius:Value(), Menu.gsodraw.cursor.width:Value(), Menu.gsodraw.cursor.colorr:Value())
+            DrawCircle(mousePos, Menu.gsodraw.cursor.radius:Value(), Menu.gsodraw.cursor.widthh:Value(), Menu.gsodraw.cursor.colorr:Value())
         end
     end
     
     Cursor = __Cursor()
 end
 
+-- items
 do
     local __Items = LocalCore:Class()
     
@@ -517,6 +519,7 @@ do
     Items = __Items()
 end
 
+-- spells
 do
     local __Spells = LocalCore:Class()
     
@@ -754,6 +757,7 @@ do
     Spells = __Spells()
 end
 
+-- target selector
 do
     local __TargetSelector = LocalCore:Class()
     
@@ -982,6 +986,7 @@ do
     TargetSelector = __TargetSelector()
 end
 
+-- object manager
 do
     local __ObjectManager = LocalCore:Class()
     
@@ -1294,6 +1299,7 @@ do
     ObjectManager = __ObjectManager()
 end
 
+-- orbwalker
 do
     local __Orbwalker = LocalCore:Class()
     
@@ -1399,7 +1405,7 @@ do
         Menu.orb.lclear:MenuElement({name = "Extra Farm Delay", id = "farmdelay", value = 50, min = 0, max = 100, step = 1})
         Menu.orb.lclear:MenuElement({name = "Should Wait Time", id = "swait", value = 500, min = 0, max = 1000, step = 100})
         Menu.orb:MenuElement({name = "Spell Manager", id = "spell", type = _G.MENU})
-        Menu.orb.spell:MenuElement({name = "Block if is attacking", id = "isaa", value = true})
+        Menu.orb.spell:MenuElement({name = "Block if is attacking", id = "isaaa", value = false})
         Menu.orb.spell:MenuElement({name = "Spells between attacks", id = "baa", value = false})
         _G.GamsteronMenuSpell = Menu.orb.spell
         Menu.orb:MenuElement({name = "Humanizer", id = "humanizer", type = _G.MENU})
@@ -1886,6 +1892,7 @@ do
     Orbwalker = __Orbwalker()
 end
 
+-- health prediction
 do
     local __HealthPrediction = LocalCore:Class()
     
@@ -2116,6 +2123,7 @@ do
     HealthPrediction = __HealthPrediction()
 end
 
+-- damage
 do
     local __Damage = LocalCore:Class()
     
@@ -2403,7 +2411,7 @@ _G.Control.CastSpell = function(key, a, b, c)
         if position ~= nil and not Cursor.IsReady then
             return false
         end
-        if position ~= nil and _G.GamsteronMenuSpell.isaa:Value() and Orbwalker:IsAutoAttacking(myHero) then
+        if position ~= nil and _G.GamsteronMenuSpell.isaaa:Value() and Orbwalker:IsAutoAttacking(myHero) then
             return false
         end
         if spell == _Q then
