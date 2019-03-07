@@ -1,4 +1,4 @@
-local GamsteronCoreVer = 0.111
+local GamsteronCoreVer = 0.12
 _G.GamsteronDebug = true
 --_G.FileDebug = io.open(SCRIPT_PATH .. "000TEST.txt", "wb")
 
@@ -1300,19 +1300,22 @@ function __GamsteronCore:IsChanneling(unit)
     return false
 end
 
-function __GamsteronCore:IsValidTarget(target)
-    if target == nil or target.networkID == nil then
-        return false
+function __GamsteronCore:IsValidTarget(target, objType)
+    if ((target == nil) or (target.networkID == nil) or (target.type == nil)) then
+        return false;
     end
-    if self.Obj_AI_Bases[target.type] ~= nil then
-        if not target.valid then
-            return false
+    if (objType and objType ~= target.type) then
+        return false;
+    end
+    if (self.Obj_AI_Bases[target.type] ~= nil) then
+        if (not target.valid) then
+            return false;
         end
     end
-    if not target.alive or target.dead or (not target.visible) or (not target.isTargetable) then
-        return false
+    if ((not target.alive) or (target.dead) or (target.health <= 0) or (not target.visible) or (not target.isTargetable)) then
+        return false;
     end
-    return true
+    return true;
 end
 
 function __GamsteronCore:GetAutoAttackRange(from, target)
