@@ -1,4 +1,4 @@
-local GamsteronOrbVer = 0.11
+local GamsteronOrbVer = 0.12
 local LocalCore, Menu, MenuItem, Cursor, Items, Spells, Damage, ObjectManager, TargetSelector, HealthPrediction, Orbwalker, HoldPositionButton
 local AttackSpeedData = {windup = myHero.attackData.windUpTime, anim = myHero.attackData.animationTime, tickwindup = os.clock(), tickanim = os.clock()}
 
@@ -88,6 +88,10 @@ local MathAbs = math.abs
 local TableInsert = _G.table.insert
 local TableRemove = _G.table.remove
 
+local _CustomProjSpeed =
+{
+    ["KayleE"] = 1750,
+}
 local function GetProjSpeed()
     local name = myHero.charName
     if LocalCore.IsMelee[name] or (LocalCore.SpecialMelees[name] ~= nil and LocalCore.SpecialMelees[name]()) then
@@ -99,8 +103,22 @@ local function GetProjSpeed()
             return projectileSpeed
         end
     end
-    if myHero.attackData.projectileSpeed then
-        return myHero.attackData.projectileSpeed
+    local buffspeed = -1
+    for i = 0, myHero.buffCount do
+        local buff = myHero:GetBuff(i)
+        if buff and buff.count and buff.count > 0 then
+            if _CustomProjSpeed[buff.name] then
+                buffspeed = _CustomProjSpeed[buff.name]
+                break
+            end
+        end
+    end
+    if buffspeed > 0 then
+        return buffspeed
+    end
+    local attackDataProj = myHero.attackData.projectileSpeed
+    if attackDataProj > 1 then
+        return attackDataProj
     end
     return MathHuge
 end
@@ -122,7 +140,9 @@ local function GetWindup()
 end
 
 local function GetAnimation()
-    if HAS_LETHAL_TEMPO then
+    if math.abs(myHero.attackData.animationTime - ATTACK_ANIMATION) > 0.25 then
+        return myHero.attackData.animationTime
+    elseif HAS_LETHAL_TEMPO then
         return myHero.attackData.animationTime
     elseif OsClock() < AttackSpeedData.tickanim and myHero.attackSpeed * (1 / myHero.attackData.animationTime / myHero.attackSpeed) <= 2.5 then
         return myHero.attackData.animationTime
@@ -2067,9 +2087,16 @@ do
                     endTime = endTime + attacker.attackData.animationTime + flyTime
                 end
                 local dmg = Damage:GetAutoAttackDamage(attacker, target)
+                local whileCount = 0
                 while endTime - GameTimer() < time do
                     hp = hp - dmg
                     endTime = endTime + attacker.attackData.animationTime + flyTime
+                    whileCount = whileCount + 1
+                    if whileCount > 10 then
+                        hp = 10000
+                        assert(false, "while count > 10... report to gamsteron thanks")
+                        break
+                    end
                 end
             end
         end
@@ -2118,7 +2145,8 @@ do
         for i = 1, #targets do
             local target = targets[i]
             local FlyTime = LocalCore:GetDistance(pos, target.pos) / projectileSpeed
-            TableInsert(self.FarmMinions, self:SetLastHitable(target, time + FlyTime, Damage:GetAutoAttackDamage(myHero, target)))
+            local dmg = Damage:GetAutoAttackDamage(myHero, target)
+            TableInsert(self.FarmMinions, self:SetLastHitable(target, time + FlyTime, dmg))
         end
         self.CanCheckTurret = false
     end
