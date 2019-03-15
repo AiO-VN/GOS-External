@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.083
+local GamsteronAIOVer = 0.084
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -321,7 +321,7 @@ local AIO = {
                     return
                 end
                 --W
-                if ((isCombo and Menu.wset.combo:Value())or(isHarass and Menu.wset.harass:Value())) and not(Menu.wset.stopwult:Value() and Game.Timer() < lastRk + 5.45) and not(Menu.wset.stopq:Value() and self.HasQBuff) and SPELLS:IsReady(_W, {q = 0, w = 1, e = 0.75, r = 0}) then
+                if ((isCombo and Menu.wset.combo:Value())or(isHarass and Menu.wset.harass:Value())) and not(Menu.wset.stopwult:Value() and Game.Timer() < SPELLS.lastRk + 5.45) and not(Menu.wset.stopq:Value() and self.HasQBuff) and SPELLS:IsReady(_W, {q = 0, w = 1, e = 0.75, r = 0}) then
                     if target then
                         WTarget = target
                     else
