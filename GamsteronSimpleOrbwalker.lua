@@ -1,13 +1,11 @@
-local START_TIME = _G.Game.Timer() + 5
-
 -- MENU --------------------------------------------------------------------------------------------------------------------------------------------------------
-local MENU_MAIN = _G.MenuElement({name = "Gamsteron " .. _G.myHero.charName, id = "gamsteron" .. _G.myHero.charName, type = _G.MENU })
-local MENU_CURSOR = MENU_MAIN:MenuElement({name = "Cursor Pos",  id = "cursor", type = _G.MENU})
-MENU_CURSOR:MenuElement({name = "Enabled",  id = "enabled", value = true})
-MENU_CURSOR:MenuElement({name = "Color",  id = "color", color = _G.Draw.Color(255, 153, 0, 76)})
-MENU_CURSOR:MenuElement({name = "Width",  id = "width", value = 3, min = 1, max = 10})
-MENU_CURSOR:MenuElement({name = "Radius",  id = "radius", value = 150, min = 1, max = 300})
-local MENU_ORBWALKER = MENU_MAIN:MenuElement({name = "Orbwalker", id = "orb", type = _G.MENU })
+local MENU_MAIN = _G.MenuElement({name = "Gamsteron " .. _G.myHero.charName, id = "gamsteron" .. _G.myHero.charName, type = _G.MENU})
+local MENU_CURSOR = MENU_MAIN:MenuElement({name = "Cursor Pos", id = "cursor", type = _G.MENU})
+MENU_CURSOR:MenuElement({name = "Enabled", id = "enabled", value = true})
+MENU_CURSOR:MenuElement({name = "Color", id = "color", color = _G.Draw.Color(255, 153, 0, 76)})
+MENU_CURSOR:MenuElement({name = "Width", id = "width", value = 3, min = 1, max = 10})
+MENU_CURSOR:MenuElement({name = "Radius", id = "radius", value = 150, min = 1, max = 300})
+local MENU_ORBWALKER = MENU_MAIN:MenuElement({name = "Orbwalker", id = "orb", type = _G.MENU})
 MENU_ORBWALKER:MenuElement({name = "Latency", id = "latency", value = 50, min = 1, max = 120})
 MENU_ORBWALKER:MenuElement({name = "Player Attack Only Click", id = "aamoveclick", key = string.byte("U")})
 MENU_ORBWALKER:MenuElement({name = "Keys", id = "keys", type = _G.MENU})
@@ -15,17 +13,17 @@ MENU_ORBWALKER.keys:MenuElement({name = "Combo Key", id = "combo", key = string.
 MENU_ORBWALKER.keys:MenuElement({name = "LastHit Key", id = "lasthit", key = string.byte("X")})
 MENU_ORBWALKER.keys:MenuElement({name = "Clear Key", id = "clear", key = string.byte("V")})
 MENU_ORBWALKER:MenuElement({name = "MyHero Attack Range", id = "me", type = _G.MENU})
-MENU_ORBWALKER.me:MenuElement({name = "Enabled",  id = "enabled", value = true})
-MENU_ORBWALKER.me:MenuElement({name = "Color",  id = "color", color = _G.Draw.Color(150, 49, 210, 0)})
-MENU_ORBWALKER.me:MenuElement({name = "Width",  id = "width", value = 1, min = 1, max = 10})
+MENU_ORBWALKER.me:MenuElement({name = "Enabled", id = "enabled", value = true})
+MENU_ORBWALKER.me:MenuElement({name = "Color", id = "color", color = _G.Draw.Color(150, 49, 210, 0)})
+MENU_ORBWALKER.me:MenuElement({name = "Width", id = "width", value = 1, min = 1, max = 10})
 MENU_ORBWALKER:MenuElement({name = "Enemy Attack Range", id = "he", type = _G.MENU})
-MENU_ORBWALKER.he:MenuElement({name = "Enabled",  id = "enabled", value = true})
-MENU_ORBWALKER.he:MenuElement({name = "Color",  id = "color", color = _G.Draw.Color(150, 255, 0, 0)})
-MENU_ORBWALKER.he:MenuElement({name = "Width",  id = "width", value = 1, min = 1, max = 10})
+MENU_ORBWALKER.he:MenuElement({name = "Enabled", id = "enabled", value = true})
+MENU_ORBWALKER.he:MenuElement({name = "Color", id = "color", color = _G.Draw.Color(150, 255, 0, 0)})
+MENU_ORBWALKER.he:MenuElement({name = "Width", id = "width", value = 1, min = 1, max = 10})
 local MENU_CHAMPION
 if _G.myHero.charName == "KogMaw" then
-    MENU_CHAMPION = MENU_MAIN:MenuElement({name = _G.myHero.charName, id = "champion", type = _G.MENU })
-    MENU_CHAMPION:MenuElement({name = "W settings", id = "wset", type = _G.MENU })
+    MENU_CHAMPION = MENU_MAIN:MenuElement({name = _G.myHero.charName, id = "champion", type = _G.MENU})
+    MENU_CHAMPION:MenuElement({name = "W settings", id = "wset", type = _G.MENU})
     MENU_CHAMPION.wset:MenuElement({id = "combo", name = "Combo", value = true})
 end
 
@@ -46,7 +44,7 @@ local IMMORTAL_BUFFS = {
     ["KarthusDeathDefiedBuff"] = true
 }
 local function IsImmortal(unit, jaxE)
-    local hp = 100*(unit.health/unit.maxHealth)
+    local hp = 100 * (unit.health / unit.maxHealth)
     IMMORTAL_BUFFS["JaxCounterStrike"] = jaxE
     IMMORTAL_BUFFS["kindredrnodeathbuff"] = hp < 10
     IMMORTAL_BUFFS["UndyingRage"] = hp < 15
@@ -79,24 +77,25 @@ local function SetCursor(work)
     -- STEP 1
     CURSOR_WORK() -- do work 1x
 end
-_G.Callback.Add("Draw", function()
-    if _G.Game.Timer() < 30 or _G.Game.Timer() < START_TIME then return end
-    if not CURSOR_READY then
-        if CURSOR_WORK ~= nil then
-            -- STEP 2
-            CURSOR_WORK() -- do work 2x
-            CURSOR_WORK = nil
-        -- STEP 3
-        elseif _G.Game.Timer() > CURSOR_SETTIME then
-            _G.Control.SetCursorPos(CURSOR_POS.x, CURSOR_POS.y)
-            if IsInRange(CURSOR_POS, _G.cursorPos, 120) then
-                CURSOR_READY = true
+Callback.Add("Load", function()
+    Callback.Add("Draw", function()
+        if not CURSOR_READY then
+            if CURSOR_WORK ~= nil then
+                -- STEP 2
+                CURSOR_WORK() -- do work 2x
+                CURSOR_WORK = nil
+                -- STEP 3
+            elseif _G.Game.Timer() > CURSOR_SETTIME then
+                _G.Control.SetCursorPos(CURSOR_POS.x, CURSOR_POS.y)
+                if IsInRange(CURSOR_POS, _G.cursorPos, 120) then
+                    CURSOR_READY = true
+                end
             end
         end
-    end
-    if MENU_CURSOR.enabled:Value() then
-        _G.Draw.Circle(_G.mousePos, MENU_CURSOR.radius:Value(), MENU_CURSOR.width:Value(), MENU_CURSOR.color:Value())
-    end
+        if MENU_CURSOR.enabled:Value() then
+            _G.Draw.Circle(_G.mousePos, MENU_CURSOR.radius:Value(), MENU_CURSOR.width:Value(), MENU_CURSOR.color:Value())
+        end
+    end)
 end)
 
 -- ORBWALKER ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,62 +162,73 @@ local function GetComboTarget()
     local enemylist = {}
     for i = 1, _G.Game.HeroCount() do
         local enemy = _G.Game.Hero(i)
-        if enemy and enemy.team ~= _G.myHero.team and enemy.valid and (not enemy.dead) and enemy.visible and enemy.isTargetable and (not IsImmortal(enemy,true)) and enemy.pos:DistanceTo(_G.myHero.pos) < _G.myHero.range + _G.myHero.boundingRadius + enemy.boundingRadius - 35 then
+        if enemy and enemy.team ~= _G.myHero.team and enemy.valid and (not enemy.dead) and enemy.visible and enemy.isTargetable and (not IsImmortal(enemy, true)) and enemy.pos:DistanceTo(_G.myHero.pos) < _G.myHero.range + _G.myHero.boundingRadius + enemy.boundingRadius - 35 then
             _G.table.insert(enemylist, enemy)
         end
     end
     if #enemylist == 0 then return nil end
-    _G.table.sort(enemylist, function(a, b) return a.health-(a.totalDamage*3)-(a.attackSpeed*200)-(a.ap*2) < b.health-(b.totalDamage*3)-(b.attackSpeed*200)-(b.ap*2) end)
+    _G.table.sort(enemylist, function(a, b) return a.health - (a.totalDamage * 3) - (a.attackSpeed * 200) - (a.ap * 2) < b.health - (b.totalDamage * 3) - (b.attackSpeed * 200) - (b.ap * 2) end)
     return enemylist[1]
 end
 
-_G.Callback.Add("Tick", function()
-    if _G.Game.Timer() < 30 or _G.Game.Timer() < START_TIME then return end
-    -- myHero buffs
-    local isblinded = false
-    for i = 0, _G.myHero.buffCount do
-        local buff = _G.myHero:GetBuff(i)
-        if buff and buff.count > 0 and buff.name:lower() == "blindingdart" then
-            isblinded = true
-            break
-        end
-    end
-    ATTACK_IS_BLINDED = isblinded
-end)
-
-_G.Callback.Add("Draw", function()
-    if _G.Game.Timer() < 30 or _G.Game.Timer() < START_TIME then return end
-    local spell = myHero.activeSpell
-    if spell and spell.valid and (spell.castEndTime > ATTACK_ENDTIME) and (not myHero.isChanneling) then
-        ATTACK_ENDTIME = spell.castEndTime
-        ATTACK_SERVER_START = spell.startTime
-    end
-    if _G.Game.IsChatOpen() or (_G.ExtLibEvade and _G.ExtLibEvade.Evading) or _G.JustEvade or (not CURSOR_READY) or (not _G.Game.IsOnTop()) then
-        return
-    end
-    if MENU_ORBWALKER.keys.combo:Value() then
-        local target = GetComboTarget()
-        if CanAttack() and target and target.pos:ToScreen().onScreen then
-            Attack(target)
-        elseif CanMove() and _G.Game.Timer() > MOVE_TIMER then
-            Move()
-        end
-    end
-end)
-
-_G.Callback.Add("Draw", function()
-    if _G.Game.Timer() < 30 or _G.Game.Timer() < START_TIME then return end
-    if MENU_ORBWALKER.me.enabled:Value() and _G.myHero.pos:ToScreen().onScreen then
-        _G.Draw.Circle(_G.myHero.pos, _G.myHero.range + _G.myHero.boundingRadius + 35, MENU_ORBWALKER.me.width:Value(), MENU_ORBWALKER.me.color:Value())
-    end
-    if MENU_ORBWALKER.he.enabled:Value() then
-        for i = 1, _G.Game.HeroCount() do
-            local enemy = _G.Game.Hero(i)
-            if enemy and enemy.visible and enemy.team ~= _G.myHero.team and enemy.valid and (not enemy.dead) then
-                _G.Draw.Circle(enemy.pos, enemy.range + enemy.boundingRadius + _G.myHero.boundingRadius, MENU_ORBWALKER.he.width:Value(), MENU_ORBWALKER.he.color:Value())
+Callback.Add("Load", function()
+    Callback.Add("Tick", function()
+        -- myHero buffs
+        local isblinded = false
+        for i = 0, _G.myHero.buffCount do
+            local buff = _G.myHero:GetBuff(i)
+            if buff and buff.count > 0 and buff.name:lower() == "blindingdart" then
+                isblinded = true
+                break
             end
         end
-    end
+        ATTACK_IS_BLINDED = isblinded
+    end)
+    
+    Callback.Add("Draw", function()
+        local s = ""
+        for i = 0, _G.myHero.buffCount do
+            local buff = _G.myHero:GetBuff(i)
+            if buff and buff.count > 0 then
+                for key, value in pairs(buff) do
+                    s = s .. key .. ": " .. value .. "\n"
+                end
+                s = s .. "\n"
+            end
+        end
+        Draw.Text(s, 150, 150)
+        
+        local spell = myHero.activeSpell
+        if spell and spell.valid and (spell.castEndTime > ATTACK_ENDTIME) and (not myHero.isChanneling) then
+            ATTACK_ENDTIME = spell.castEndTime
+            ATTACK_SERVER_START = spell.startTime
+        end
+        if _G.Game.IsChatOpen() or (_G.ExtLibEvade and _G.ExtLibEvade.Evading) or _G.JustEvade or (not CURSOR_READY) or (not _G.Game.IsOnTop()) then
+            return
+        end
+        if MENU_ORBWALKER.keys.combo:Value() then
+            local target = GetComboTarget()
+            if CanAttack() and target and target.pos:ToScreen().onScreen then
+                Attack(target)
+            elseif CanMove() and _G.Game.Timer() > MOVE_TIMER then
+                Move()
+            end
+        end
+    end)
+    
+    Callback.Add("Draw", function()
+        if MENU_ORBWALKER.me.enabled:Value() and _G.myHero.pos:ToScreen().onScreen then
+            _G.Draw.Circle(_G.myHero.pos, _G.myHero.range + _G.myHero.boundingRadius + 35, MENU_ORBWALKER.me.width:Value(), MENU_ORBWALKER.me.color:Value())
+        end
+        if MENU_ORBWALKER.he.enabled:Value() then
+            for i = 1, _G.Game.HeroCount() do
+                local enemy = _G.Game.Hero(i)
+                if enemy and enemy.visible and enemy.team ~= _G.myHero.team and enemy.valid and (not enemy.dead) then
+                    _G.Draw.Circle(enemy.pos, enemy.range + enemy.boundingRadius + _G.myHero.boundingRadius, MENU_ORBWALKER.he.width:Value(), MENU_ORBWALKER.he.color:Value())
+                end
+            end
+        end
+    end)
 end)
 
 -- KOGMAW ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,7 +238,7 @@ if _G.myHero.charName == "KogMaw" then
             local isTarget = false
             for i = 1, _G.Game.HeroCount() do
                 local enemy = _G.Game.Hero(i)
-                if enemy and enemy.team ~= _G.myHero.team and enemy.valid and (not enemy.dead) and enemy.visible and enemy.isTargetable and (not IsImmortal(enemy,true)) and enemy.pos:DistanceTo(_G.myHero.pos) < 610 + (20 * _G.myHero:GetSpellData(_W).level) + myHero.boundingRadius + enemy.boundingRadius - 35 then
+                if enemy and enemy.team ~= _G.myHero.team and enemy.valid and (not enemy.dead) and enemy.visible and enemy.isTargetable and (not IsImmortal(enemy, true)) and enemy.pos:DistanceTo(_G.myHero.pos) < 610 + (20 * _G.myHero:GetSpellData(_W).level) + myHero.boundingRadius + enemy.boundingRadius - 35 then
                     isTarget = true
                     break
                 end
@@ -239,8 +249,9 @@ if _G.myHero.charName == "KogMaw" then
         end
     end
     PreAttack = function() CastW() end
-    _G.Callback.Add("Tick", function()
-        if _G.Game.Timer() < 30 or _G.Game.Timer() < START_TIME then return end
-        if CanMove() and IsBeforeAttack(0.55) then CastW() end
+    Callback.Add("Load", function()
+        Callback.Add("Tick", function()
+            if CanMove() and IsBeforeAttack(0.55) then CastW() end
+        end)
     end)
 end
