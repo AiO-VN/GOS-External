@@ -2,6 +2,125 @@
 -- API CHECKER ------------------------------------------------------------------------------------------------------------------------------------------------
 
 Callback.Add("Load", function()
+    local HeroNames = {}
+    do
+        local fileHeroesRead = io.open(SCRIPT_PATH .. "_HeroNames.txt", "r")
+        if fileHeroesRead ~= nil then
+            for line in fileHeroesRead:lines() do
+                if #line > 0 then
+                    HeroNames[line] = true
+                    print("hero: " .. line)
+                end
+            end
+            fileHeroesRead:close()
+        end
+    end
+    
+    local MinionNames = {}
+    do
+        local fileMinionsRead = io.open(SCRIPT_PATH .. "_MinionNames.txt", "r")
+        if fileMinionsRead ~= nil then
+            for line in fileMinionsRead:lines() do
+                if #line > 0 then
+                    MinionNames[line] = true
+                    print("minion: " .. line)
+                end
+            end
+            fileMinionsRead:close()
+        end
+    end
+    
+    local fileHeroes = io.open(SCRIPT_PATH .. "_HeroNames.txt", "a")
+    local fileMinions = io.open(SCRIPT_PATH .. "_MinionNames.txt", "a")
+    
+    local function UserDataToTable(u)
+        return {
+            --[[networkID = u.networkID,
+            handle = u.handle,
+            chnd = u.chnd,
+            buffCount = u.buffCount,
+            isMe = u.isMe,
+            isAlly = u.isAlly,--]]
+            isEnemy = u.isEnemy,
+            team = u.team,
+            --[[owner = u.owner,
+            targetID = u.targetID,--]]
+            type = u.type,
+            --name = u.name,
+            charName = u.charName,
+            --[[health = u.health,
+            maxHealth = u.maxHealth,
+            mana = u.mana,
+            maxMana = u.maxMana,
+            hudAmmo = u.hudAmmo,
+            hudMaxAmmo = u.hudMaxAmmo,
+            shieldAD = u.shieldAD,
+            shieldAP = u.shieldAP,
+            cdr = u.cdr,
+            armorPen = u.armorPen,
+            armorPenPercent = u.armorPenPercent,
+            bonusArmorPenPercent = u.bonusArmorPenPercent,
+            magicPen = u.magicPen,
+            magicPenPercent = u.magicPenPercent,
+            baseDamage = u.baseDamage,
+            bonusDamage = u.bonusDamage,
+            totalDamage = u.totalDamage,
+            ap = u.ap,
+            lifeSteal = u.lifeSteal,
+            spellVamp = u.spellVamp,
+            attackSpeed = u.attackSpeed,
+            critChance = u.critChance,
+            armor = u.armor,
+            bonusArmor = u.bonusArmor,
+            magicResist = u.magicResist,
+            bonusMagicResist = u.bonusMagicResist,
+            hpRegen = u.hpRegen,
+            mpRegen = u.mpRegen,
+            ms = u.ms,
+            range = u.range,
+            boundingRadius = u.boundingRadius,
+            gold = u.gold,
+            totalGold = u.totalGold,--]]
+            dead = u.dead,
+            visible = u.visible,
+            isImmortal = u.isImmortal,
+            isTargetable = u.isTargetable,
+            isTargetableToTeam = u.isTargetableToTeam,
+            --[[distance = u.distance,
+            pos = u.pos,
+            posTo = u.posTo,
+            hpBar = u.hpBar,
+            pos2D = u.pos2D,
+            toScreen = u.toScreen,
+            posMM = u.posMM,
+            dir = u.dir,
+            isCampUp = u.isCampUp,--]]
+            valid = u.valid,
+            --[[attackData = u.attackData,
+            levelData = u.levelData,
+            activeSpell = u.activeSpell,
+            activeSpellSlot = u.activeSpellSlot,
+            isChanneling = u.isChanneling,
+            missileData = u.missileData,
+            bonusDamagePercent = u.bonusDamagePercent,
+            flatDamageReduction = u.flatDamageReduction,
+            pathing = u.pathing,--]]
+        }
+    end
+    
+    local function OrderedByKey(t)
+        local s = ""
+        local keys = {}
+        for key, value in pairs(t) do
+            table.insert(keys, key)
+        end
+        table.sort(keys, function(a, b) return a < b end)
+        for i, key in pairs(keys) do
+            s = s .. key .. ": " .. tostring(t[key]) .. " "
+        end
+        return s
+    end
+    
     local ApiChecker =
     {
         Buffs = function()
@@ -17,9 +136,43 @@ Callback.Add("Load", function()
             end
             Draw.Text(s, 150, 150)
         end,
+        Objects = function()
+            for i = 1, Game.HeroCount() do
+                local o = Game.Hero(i)
+                if o then
+                    local name = o.charName
+                    if name and HeroNames[name] == nil then
+                        fileHeroes:write(name .. "\n")
+                        HeroNames[name] = true
+                    end
+                end
+            end
+            for i = 1, Game.MinionCount() do
+                local o = Game.Minion(i)
+                if o then
+                    local name = o.charName
+                    if name and MinionNames[name] == nil then
+                        fileMinions:write(name .. "\n")
+                        MinionNames[name] = true
+                    end
+                end
+            end
+        end,
     }
+    
     Callback.Add("Draw", function()
         --ApiChecker.Buffs()
+        --ApiChecker.Objects()
+    end)
+    
+    Callback.Add("UnLoad", function()
+        fileHeroes:close()
+        fileMinions:close()
+    end)
+    
+    Callback.Add("GameEnd", function()
+        fileHeroes:close()
+        fileMinions:close()
     end)
 end)
 
@@ -39,7 +192,7 @@ local MainMenu = MenuElement({name = "Gamsteron " .. myHero.charName, id = "gams
 
 local CursorMenu = MainMenu:MenuElement({name = "Cursor Pos", id = "cursor", type = MENU})
 CursorMenu:MenuElement({name = "Enabled", id = "enabled", value = true})
-CursorMenu:MenuElement({name = "Color", id = "color", color = Draw.Color(255, 153, 0, 76)})
+CursorMenu:MenuElement({name = "Color", id = "color", color = Draw.Color(255, 0, 255, 0)})
 CursorMenu:MenuElement({name = "Width", id = "width", value = 3, min = 1, max = 10})
 CursorMenu:MenuElement({name = "Radius", id = "radius", value = 150, min = 1, max = 300})
 
