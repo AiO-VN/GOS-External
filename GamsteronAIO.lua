@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.084
+local GamsteronAIOVer = 0.085
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -1265,7 +1265,7 @@ local AIO = {
                     for i = 1, LocalGameHeroCount() do
                         local hero = LocalGameHero(i)
                         if LocalCore:IsValidTarget(hero) and hero.team == LocalCore.TEAM_ENEMY and myHero.pos:DistanceTo(hero.pos) < eRange + hero.boundingRadius and not OB:IsHeroImmortal(hero, false) then
-                            if Menu.eset.useonstun[hero.charName] and Menu.eset.useonstun[hero.charName]:Value() and CheckWall(myHero.pos, hero.pos, 450) and CheckWall(myHero.pos, hero:GetPrediction(self.EData.Delay + 0.06 + LATENCY, self.EData.Speed), 450) then
+                            if Menu.eset.useonstun[hero.charName] and Menu.eset.useonstun[hero.charName]:Value() and CheckWall(myHero.pos, hero:GetPrediction(self.EData.Delay + 0.06 + LATENCY, self.EData.Speed), 475) then
                                 result = Control.CastSpell(HK_E, hero)
                                 break
                             end
@@ -1615,7 +1615,6 @@ local AIO = {
                         end
                         local wTarget = TS:GetTarget(blazeList, 1);
                         if LocalCore:IsValidTarget(wTarget, Obj_AI_Hero) then
-                            print("1: " .. os.clock())
                             if CastSpell(HK_W, wTarget, self.WData, Menu.wset.auto.hitchance:Value() + 1) then
                                 return
                             end
@@ -1623,7 +1622,6 @@ local AIO = {
                         if LocalGameTimer() > SPELLS.LastQk + 0.77 and LocalGameTimer() > SPELLS.LastEk + 0.77 and LocalGameTimer() > SPELLS.LastRk + 0.77 then
                             wTarget = TS:GetTarget(enemyList, 1)
                             if LocalCore:IsValidTarget(wTarget, Obj_AI_Hero) then
-                                print("2: " .. os.clock())
                                 if CastSpell(HK_W, wTarget, self.WData, Menu.wset.auto.hitchance:Value() + 1) then
                                     return
                                 end
