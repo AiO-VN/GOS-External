@@ -1,4 +1,4 @@
-local GamsteronOrbVer = 0.12
+local GamsteronOrbVer = 0.13
 local LocalCore, Menu, MenuItem, Cursor, Items, Spells, Damage, ObjectManager, TargetSelector, HealthPrediction, Orbwalker, HoldPositionButton
 local AttackSpeedData = {windup = myHero.attackData.windUpTime, anim = myHero.attackData.animationTime, tickwindup = os.clock(), tickanim = os.clock()}
 
@@ -603,7 +603,7 @@ do
     
     function __Spells:DisableAutoAttack()
         local a = myHero.activeSpell
-        if a and a.valid and a.startTime > self.StartTime and myHero.isChanneling and not LocalCore.SpecialAutoAttacks[a.name] then
+        if a and a.valid and a.castEndTime - a.windup > self.StartTime and myHero.isChanneling and not LocalCore.SpecialAutoAttacks[a.name] then
             local name = a.name
             if self.Work == nil and GameTimer() > self.WorkEndTime and self.WorkList[name] ~= nil then
                 self.WorkEndTime = GameTimer() + self.WorkList[name][1]
@@ -611,10 +611,10 @@ do
             end
             local twindup = self.WindupList[name]
             local windup = twindup ~= nil and twindup or a.windup
-            local t = a.startTime + windup
+            self.StartTime = a.castEndTime - a.windup
+            local t = self.StartTime + windup
             t = t - LATENCY
             self.SpellEndTime = t
-            self.StartTime = a.startTime
             if GameTimer() < Orbwalker.AttackLocalStart + GetWindup() - 0.09 or GameTimer() < Orbwalker.AttackCastEndTime - 0.1 then
                 Orbwalker:__OnAutoAttackReset()
             end
@@ -1817,8 +1817,8 @@ do
                 self.OnAttackC[i]()
             end
             self.AttackCastEndTime = spell.castEndTime
-            self.AttackServerStart = spell.startTime
             ATTACK_WINDUP = spell.windup
+            self.AttackServerStart = self.AttackCastEndTime - ATTACK_WINDUP
             ATTACK_ANIMATION = spell.animation
             if GAMSTERON_MODE_DMG then
                 if self.TestCount == 0 then
