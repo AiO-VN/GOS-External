@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.085
+local GamsteronAIOVer = 0.087
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -1179,7 +1179,6 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(VayneVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            _G.GamsteronMenuSpell.isaaa:Value(false)
             self.LastReset = 0
             self.EData = {Delay = 0.5, Radius = 0, Range = 550 - 35, Speed = 2000, Collision = false, Type = _G.SPELLTYPE_LINE}
         end
@@ -1398,7 +1397,6 @@ local AIO = {
         Menu:MenuElement({name = "Version " .. tostring(BrandVersion), type = _G.SPACE, id = "verspace"})
         CHAMPION = LocalCore:Class()
         function CHAMPION:__init()
-            _G.GamsteronMenuSpell.isaaa:Value(false);
             self.ETarget = nil
             self.QData = {Delay = 0.25, Radius = 60, Range = 1085, Speed = 1600, Collision = true, Type = _G.SPELLTYPE_LINE}
             self.WData = {Delay = 0.9, Radius = 260, Range = 880, Speed = math.huge, Collision = false, Type = _G.SPELLTYPE_CIRCLE}
@@ -2615,6 +2613,22 @@ AddLoadCallback(function()
     local set = 0;
     if CHAMPION.Draw then
         Callback.Add('Draw', function()
+        	--[[for i = 1, Game.ParticleCount() do
+        		print("particle")
+    		end
+            for i = 1, LocalGameHeroCount() do
+                local hero = LocalGameHero(i)
+                if LocalCore:IsValidTarget(hero) and hero.team == LocalCore.TEAM_ENEMY and myHero.pos:DistanceTo(hero.pos) < 1000 and not OB:IsHeroImmortal(hero, false) then
+                	local s = ""
+                    for j = 0, hero.buffCount do
+                    	for k, v in pairs(hero:GetBuff(j)) do
+                    		s = s .. k .. ": " .. v .. "\n"
+                		end
+                		s = s .. "\n"
+                	end
+                	Draw.Text(s, 18, hero.pos:To2D())
+                end
+            end--]]
             --[===============[
             local str = "";
             local sd = myHero:GetSpellData(_Q);
