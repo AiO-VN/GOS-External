@@ -1,4 +1,4 @@
--- version 0.154
+-- version 0.155
 --[=========================================================[
  
  
@@ -75,7 +75,7 @@ require('GamsteronCore');
 local LocalCore = _G.GamsteronCore;
 
 -- AUTO UPDATER
-local UPDATERVersion = 0.154;
+local UPDATERVersion = 0.155;
 local UPDATERScriptName = "GamsteronPrediction";
 local UPDATERsuccess, UPDATERversion = LocalCore:AutoUpdate({
     version = UPDATERVersion,
@@ -1284,3 +1284,28 @@ Callback.Add("Load", function()
         end
     end)
 end)
+
+do
+    local function LocalClass()
+        local cls = {}
+        cls.__index = cls
+        return setmetatable(cls, {__call = function (c, ...)
+            local instance = setmetatable({}, cls)
+            if cls.__init then
+                cls.__init(instance, ...)
+            end
+            return instance
+        end})
+    end
+
+    local __GamsteronPrediction = LocalClass()
+
+    function __GamsteronPrediction:__init()
+    end
+
+    function __GamsteronPrediction:GetPrediction(unit, args, source)
+        return GetGamsteronPrediction(unit, args, source)
+    end
+
+    _G.GamsteronPrediction = __GamsteronPrediction()
+end
