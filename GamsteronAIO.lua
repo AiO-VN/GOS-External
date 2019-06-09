@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.087
+local GamsteronAIOVer = 0.088
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -312,7 +312,7 @@ local AIO = {
                     return
                 end
                 -- [ get combo target ]
-                local target = TS:GetComboTarget()
+                local target = TS:GetOrbComboTarget()
                 if target and ORB:CanAttack() then
                     return
                 end
@@ -986,7 +986,7 @@ local AIO = {
                 return
             end
             -- Can Attack
-            local AATarget = TS:GetComboTarget()
+            local AATarget = TS:GetOrbComboTarget()
             if AATarget and not ORB.IsNone and ORB:CanAttack() then
                 return
             end
@@ -1284,7 +1284,7 @@ local AIO = {
                     isAttacking = true
                 end
                 -- Can Attack
-                local AATarget = TS:GetComboTarget()
+                local AATarget = TS:GetOrbComboTarget()
                 if AATarget and not ORB.IsNone and ORB:CanAttack() then
                     isAttacking = true
                 end
@@ -1795,7 +1795,7 @@ local AIO = {
             end
             
             -- [ get attack target ]
-            local AATarget = TS:GetComboTarget()
+            local AATarget = TS:GetOrbComboTarget()
             
             -- [ can attack ]
             if AATarget and not ORB.IsNone and ORB:CanAttack() then
@@ -1979,7 +1979,7 @@ local AIO = {
                 return
             end
             -- Can Attack
-            local AATarget = TS:GetComboTarget()
+            local AATarget = TS:GetOrbComboTarget()
             if not self.HasQBuff and AATarget and not ORB.IsNone and ORB:CanAttack() then
                 return
             end
@@ -2565,7 +2565,7 @@ local AIO = {
 
 AIO[LocalCharName]()
 
-AddLoadCallback(function()
+Callback.Add("Load", function()
     ORB, TS, OB, DMG, SPELLS = _G.SDK.Orbwalker, _G.SDK.TargetSelector, _G.SDK.ObjectManager, _G.SDK.Damage, _G.SDK.Spells
     CHAMPION = CHAMPION()
     if CHAMPION.Interrupter then
@@ -2593,26 +2593,18 @@ AddLoadCallback(function()
         CHAMPION:RClear()
     end
     if CHAMPION.Farm then
-        Callback.Add("Tick", function()
-            if _G.GamsteronDebug then
-                local status, err = pcall(function () CHAMPION:Farm() end) if not status then print("CHAMPION.Farm " .. tostring(err)) end
-            else
-                CHAMPION:Farm()
-            end
+        table.insert(SDK.Tick, function()
+        	CHAMPION:Farm()
         end)
     end
     if CHAMPION.Tick then
-        Callback.Add("Draw", function()
-            if _G.GamsteronDebug then
-                local status, err = pcall(function () CHAMPION:Tick() end) if not status then print("CHAMPION.Tick " .. tostring(err)) end
-            else
-                CHAMPION:Tick()
-            end
+        table.insert(SDK.Draw, function()
+        	CHAMPION:Tick()
         end)
     end
     local set = 0;
     if CHAMPION.Draw then
-        Callback.Add('Draw', function()
+        table.insert(SDK.Draw, function()
         	--[[for i = 1, Game.ParticleCount() do
         		print("particle")
     		end
@@ -2646,20 +2638,12 @@ AddLoadCallback(function()
                 print(et);
             end
             --]===============]
-            if _G.GamsteronDebug then
-                local status, err = pcall(function () CHAMPION:Draw() end) if not status then print("CHAMPION.Draw " .. tostring(err)) end
-            else
-                CHAMPION:Draw()
-            end
+            CHAMPION:Draw()
         end)
     end
     if CHAMPION.WndMsg then
-        Callback.Add('WndMsg', function(msg, wParam)
-            if _G.GamsteronDebug then
-                local status, err = pcall(function() CHAMPION:WndMsg(msg, wParam) end) if not status then print("CHAMPION.WndMsg " .. tostring(err)) end
-            else
-                CHAMPION:WndMsg(msg, wParam)
-            end
+        table.insert(SDK.WndMsg, function(msg, wParam)
+        	CHAMPION:WndMsg(msg, wParam)
         end)
     end
 end)
