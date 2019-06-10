@@ -1,4 +1,4 @@
--- version 0.155
+-- version 0.156
 --[=========================================================[
  
  
@@ -75,7 +75,7 @@ require('GamsteronCore');
 local LocalCore = _G.GamsteronCore;
 
 -- AUTO UPDATER
-local UPDATERVersion = 0.155;
+local UPDATERVersion = 0.156;
 local UPDATERScriptName = "GamsteronPrediction";
 local UPDATERsuccess, UPDATERversion = LocalCore:AutoUpdate({
     version = UPDATERVersion,
@@ -1000,6 +1000,7 @@ local function GetPrediction(unit, source, speed, radius, delay, stype)
                                 --print("high: > 750")
                             else
                                 hitChance = 2;
+                                --print("normal2")
                             end
                         end
                     end
@@ -1079,7 +1080,8 @@ function GetGamsteronPrediction(unit, args, source)
     if (args.CollisionTypes ~= nil) then
         inputCollisionTypes = args.CollisionTypes;
     end
-    local inputDelay = 0.06 + _G.LATENCY;
+    local latency = _G.LATENCY > 1 and _G.LATENCY * 0.001 or _G.LATENCY
+    local inputDelay = 0.06 + latency;
     if (args.Delay ~= nil) then
         inputDelay = inputDelay + args.Delay;
     end
