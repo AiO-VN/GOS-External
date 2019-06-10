@@ -1,4 +1,4 @@
-local GamsteronOrbVer = 0.13
+local GamsteronOrbVer = 0.14
 local LocalCore, Menu, MenuItem, Cursor, Items, Spells, Damage, ObjectManager, TargetSelector, HealthPrediction, Orbwalker, HoldPositionButton
 local AttackSpeedData = {windup = myHero.attackData.windUpTime, anim = myHero.attackData.animationTime, tickwindup = os.clock(), tickanim = os.clock()}
 
@@ -2514,7 +2514,12 @@ _G.SDK =
     ORBWALKER_MODE_LANECLEAR = 2,
     ORBWALKER_MODE_JUNGLECLEAR = 3,
     ORBWALKER_MODE_LASTHIT = 4,
-    ORBWALKER_MODE_FLEE = 5
+    ORBWALKER_MODE_FLEE = 5,
+    Load = {}, -- ok
+    Draw = {}, -- ok
+    Tick = {}, -- ok
+    FastTick = {}, -- ok
+    WndMsg = {}, -- ok
 }
 _G.SDK.Spells = Spells
 _G.SDK.ObjectManager = ObjectManager
@@ -2558,6 +2563,25 @@ LocalCore:OnEnemyHeroLoad(function(hero)
 end)
 
 AddLoadCallback(function()
+    for _, cb in ipairs(SDK.Load) do
+        cb()
+    end
+    local draw_cb, fast_tick_cb, tick_cb, wnd_cb = SDK.Draw, SDK.FastTick, SDK.Tick, SDK.WndMsg
+    Callback.Add("Draw", function()
+        for i = 1, #fast_tick_cb do fast_tick_cb[i]() end
+        for i = 1, #draw_cb do draw_cb[i]() end
+    end)
+    Callback.Add("Tick", function()
+        for i = 1, #tick_cb do tick_cb[i]() end
+    end)
+    Callback.Add("WndMsg", function(msg, wParam)
+        for i = 1, #wnd_cb do wnd_cb[i](msg, wParam) end
+    end)
+    SDK.Load = {}
+    SDK.FastTick = {}
+    SDK.Draw = {}
+    SDK.Tick = {}
+    SDK.WndMsg = {}
     Callback.Add('Draw', function()
         local hasTeemoBlind = false
         local hasLethal = false
