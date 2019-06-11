@@ -1,4 +1,4 @@
-local GamsteronAIOVer = 0.088
+local GamsteronAIOVer = 0.089
 local LocalCore, Menu, CHAMPION, INTERRUPTER, ORB, TS, OB, DMG, SPELLS
 do
     if _G.GamsteronAIOLoaded == true then return end
@@ -312,7 +312,7 @@ local AIO = {
                     return
                 end
                 -- [ get combo target ]
-                local target = TS:GetOrbComboTarget()
+                local target = TS:GetComboTarget()
                 if target and ORB:CanAttack() then
                     return
                 end
@@ -517,7 +517,6 @@ local AIO = {
             local result = false
             if SPELLS:IsReady(_Q, {q = 1, w = 0.3, e = 0.3, r = 0.3}) then
                 local EnemyHeroes = OB:GetEnemyHeroes(self.QData.Range, false, LocalCore.HEROES_SPELL)
-                
                 if Menu.qset.killsteal.enabled:Value() then
                     local baseDmg = 25
                     local lvlDmg = 55 * myHero:GetSpellData(_Q).level
@@ -986,7 +985,7 @@ local AIO = {
                 return
             end
             -- Can Attack
-            local AATarget = TS:GetOrbComboTarget()
+            local AATarget = TS:GetComboTarget()
             if AATarget and not ORB.IsNone and ORB:CanAttack() then
                 return
             end
@@ -1284,7 +1283,7 @@ local AIO = {
                     isAttacking = true
                 end
                 -- Can Attack
-                local AATarget = TS:GetOrbComboTarget()
+                local AATarget = TS:GetComboTarget()
                 if AATarget and not ORB.IsNone and ORB:CanAttack() then
                     isAttacking = true
                 end
@@ -1795,7 +1794,7 @@ local AIO = {
             end
             
             -- [ get attack target ]
-            local AATarget = TS:GetOrbComboTarget()
+            local AATarget = TS:GetComboTarget()
             
             -- [ can attack ]
             if AATarget and not ORB.IsNone and ORB:CanAttack() then
@@ -1979,7 +1978,7 @@ local AIO = {
                 return
             end
             -- Can Attack
-            local AATarget = TS:GetOrbComboTarget()
+            local AATarget = TS:GetComboTarget()
             if not self.HasQBuff and AATarget and not ORB.IsNone and ORB:CanAttack() then
                 return
             end
